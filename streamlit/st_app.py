@@ -24,22 +24,17 @@ st.write(df_prices.shape)
 # %%
 fuel_type = st.sidebar.selectbox("fuel type", df_prices.columns)
 resample_type = st.sidebar.selectbox("resample period ", ["1D", "3D", "W"])
-filtered_fuel = df_prices[
-    ~df_prices[fuel_type].isna()
-]
+filtered_fuel = df_prices[~df_prices[fuel_type].isna()]
 
 filtered_fuel.index = pd.to_datetime(filtered_fuel.index)
 df_plot = filtered_fuel.resample(resample_type).mean().bfill()
 fig = go.Figure(
     [
         go.Scatter(
-            x=df_plot.index,
-            y=df_plot[fuel_type],
-            line={'smoothing': 1.3}
+            x=df_plot.index, y=df_plot[fuel_type], line={"smoothing": 1.3}
         )
     ]
 )
 
 st.plotly_chart(fig, use_container_width=True)
 st.write(df_plot.shape)
-

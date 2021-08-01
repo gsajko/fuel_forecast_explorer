@@ -35,17 +35,22 @@ def add_datepart_time(df, fldname, drop=True):
     if drop:
         df.drop(fldname, axis=1, inplace=True)
 
+
 def pivot_fill(df, sample, col_to_resample):
     df.timestamp = pd.to_datetime(df.timestamp)
     is_float = df[col_to_resample].dtype == np.float64
     if is_float:
-        aggfunc="mean"
+        aggfunc = "mean"
     else:
-        aggfunc="first"
+        aggfunc = "first"
     if (not is_float) & (sample != "1D"):
         raise TypeError("Only 1D sample supported for non-float types")
     df = pd.pivot_table(
-        df, values=col_to_resample, index="timestamp", columns=["siteid"], aggfunc=aggfunc
+        df,
+        values=col_to_resample,
+        index="timestamp",
+        columns=["siteid"],
+        aggfunc=aggfunc,
     )
     if is_float:
         df.fillna(method="ffill", inplace=True)
@@ -61,11 +66,14 @@ def pivot_fill(df, sample, col_to_resample):
         df_resampled["timestamp"] = pd.to_datetime(
             df_resampled[["year", "month", "day"]]
         )
-        df_resampled = df_resampled.drop(columns=["year", "month", "day", "hour"])
+        df_resampled = df_resampled.drop(
+            columns=["year", "month", "day", "hour"]
+        )
         df_resampled.columns = ["siteid", "brand", "timestamp"]
         df_resampled.drop_duplicates(keep="last", inplace=True)
 
     return df_resampled
+
 
 # %%
 # choose fuel
@@ -84,8 +92,16 @@ resamp_price = pivot_fill(to_re, "1D", "price")
 resamp_brand = pivot_fill(to_re, "1D", "site_brand")
 
 # concat dfs
-resamp_price = resamp_price.reset_index(drop=True).groupby(["timestamp", "siteid"]).agg("first")
-resamp_brand = resamp_brand.reset_index(drop=True).groupby(["timestamp", "siteid"]).agg("first")
+resamp_price = (
+    resamp_price.reset_index(drop=True)
+    .groupby(["timestamp", "siteid"])
+    .agg("first")
+)
+resamp_brand = (
+    resamp_brand.reset_index(drop=True)
+    .groupby(["timestamp", "siteid"])
+    .agg("first")
+)
 result = pd.concat([resamp_price, resamp_brand], axis=1)
 result.dropna(inplace=True)
 result = result.reset_index()
