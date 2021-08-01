@@ -43,7 +43,7 @@ df_clean = df[~df.siteid.isin(closed_sites)].copy()
 # %%
 # save it
 df_clean.to_csv(
-    "../data/aggregated/prices_all_clean.csv.gz", index=True, compression="gzip"
+    "../data/aggregated/prices_all_clean.csv.gz", index=False, compression="gzip"
 )
 
 
