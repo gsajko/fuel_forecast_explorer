@@ -50,17 +50,7 @@ df_clean = df[~df.siteid.isin(closed_sites)].copy()
 # save it
 df_clean.to_csv(
     "../data/aggregated/prices_all_clean.csv.gz",
-<<<<<<< HEAD
     index=False,
     compression="gzip",
 )
-
-print("❗️")
-=======
-    index=True,
-    compression="gzip",
-)
-
-
->>>>>>> dedb79830085ccc704b6181817d08af46298cce5
 # %%
