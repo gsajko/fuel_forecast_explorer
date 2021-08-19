@@ -34,8 +34,10 @@ if "df_pivot" not in st.session_state:
 df_pivot = st.session_state.df_pivot
 # %%
 # sidebar
+today = datetime.date.today()
+yesterday = today - datetime.timedelta(days=1)
 start_date = st.sidebar.date_input("From: ", datetime.date(2021, 1, 1))
-end_date = st.sidebar.date_input("From: ", datetime.date(2021, 5, 1))
+end_date = st.sidebar.date_input("From: ", yesterday)
 fuel_type = st.sidebar.selectbox(
     "fuel type", df.fuel_type.value_counts().index.to_list(), 1
 )
