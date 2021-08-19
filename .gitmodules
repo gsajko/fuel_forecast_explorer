@@ -1,0 +1,3 @@
+[submodule "scrape_data"]
+	path = scrape_data
+	url = https://github.com/gsajko/QLD_fuel_scraping.git
