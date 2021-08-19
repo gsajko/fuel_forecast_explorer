@@ -53,6 +53,4 @@ df_clean.to_csv(
     index=False,
     compression="gzip",
 )
-
-
 # %%

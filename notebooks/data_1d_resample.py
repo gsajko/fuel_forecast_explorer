@@ -18,7 +18,22 @@ df["siteid"] = df["siteid"].astype(str)
 df["timestamp"] = pd.to_datetime(df["timestamp"])
 df.info(verbose=True, null_counts=True)
 # %%
-# functions
+# fill missing data between fuel price changes
+def pivot_fill(df, sample, to_resample):
+    df.timestamp = pd.to_datetime(df.timestamp)
+    df = pd.pivot_table(
+        df, values=to_resample, index="timestamp", columns=["siteid"]
+    )
+    df.fillna(method="ffill", inplace=True)
+    df.describe()
+    df_resampled = df.resample(sample).mean()
+    df_resampled = df_resampled.stack().reset_index()
+    df_resampled.columns = ["timestamp", "siteid", to_resample]
+    df_resampled.timestamp = pd.to_datetime(df_resampled.timestamp)
+    return df_resampled
+
+
+# %%
 def add_datepart_time(df, fldname, drop=True):
     "Helper function that adds columns relevant to a date."
     fld = df[fldname]
@@ -36,76 +51,72 @@ def add_datepart_time(df, fldname, drop=True):
         df.drop(fldname, axis=1, inplace=True)
 
 
-def pivot_fill(df, sample, col_to_resample):
-    df.timestamp = pd.to_datetime(df.timestamp)
-    is_float = df[col_to_resample].dtype == np.float64
-    if is_float:
-        aggfunc = "mean"
-    else:
-        aggfunc = "first"
-    if (not is_float) & (sample != "1D"):
-        raise TypeError("Only 1D sample supported for non-float types")
-    df = pd.pivot_table(
+def gen_df_brand(df):
+    df_brand = pd.pivot_table(
         df,
-        values=col_to_resample,
+        values="site_brand",
         index="timestamp",
         columns=["siteid"],
-        aggfunc=aggfunc,
+        aggfunc="first",
     )
-    if is_float:
-        df.fillna(method="ffill", inplace=True)
-        df_resampled = df.resample(sample).mean()
-        df_resampled = df_resampled.stack().reset_index()
-        df_resampled.columns = ["timestamp", "siteid", col_to_resample]
-        df_resampled.timestamp = pd.to_datetime(df_resampled.timestamp)
-    else:
-        df.fillna(method="ffill", inplace=True)
-        df.fillna(method="bfill", inplace=True)
-        df_resampled = df.stack().reset_index()
-        add_datepart_time(df_resampled, "timestamp")
-        df_resampled["timestamp"] = pd.to_datetime(
-            df_resampled[["year", "month", "day"]]
-        )
-        df_resampled = df_resampled.drop(
-            columns=["year", "month", "day", "hour"]
-        )
-        df_resampled.columns = ["siteid", "brand", "timestamp"]
-        df_resampled.drop_duplicates(keep="last", inplace=True)
-
-    return df_resampled
+    df_brand.fillna(method="ffill", inplace=True)
+    df_brand.fillna(method="bfill", inplace=True)
+    df_brand = df_brand.stack().reset_index()
+    add_datepart_time(df_brand, "timestamp")
+    df_brand["timestamp"] = pd.to_datetime(
+        df_brand[["year", "month", "day", "hour"]]
+    )
+    df_brand = df_brand.drop(columns=["year", "month", "day", "hour"])
+    df_brand.columns = ["siteid", "brand", "timestamp"]
+    df_brand.drop_duplicates(keep="last", inplace=True)
+    return df_brand
 
 
 # %%
-# choose fuel
 to_re = df[df.fuel_type == "e10"]
-to_re.info(verbose=True, null_counts=True)
-# %%
-# remove sites that have fewer then 100 entries
-s = to_re.siteid.value_counts().reset_index()
-s.columns = ["siteid", "counts"]
-sites_with_enough_entries = s[s.counts > 100].siteid.tolist()
-to_re = to_re[to_re.siteid.isin(sites_with_enough_entries)]
-to_re.info(verbose=True, null_counts=True)
-# %%
-# resample columns to 1D
-resamp_price = pivot_fill(to_re, "1D", "price")
-resamp_brand = pivot_fill(to_re, "1D", "site_brand")
-
-# concat dfs
-resamp_price = (
-    resamp_price.reset_index(drop=True)
-    .groupby(["timestamp", "siteid"])
-    .agg("first")
-)
-resamp_brand = (
-    resamp_brand.reset_index(drop=True)
-    .groupby(["timestamp", "siteid"])
-    .agg("first")
-)
-result = pd.concat([resamp_price, resamp_brand], axis=1)
-result.dropna(inplace=True)
-result = result.reset_index()
-# %%
-result.to_csv("../data/aggregated/resamp_e10.csv", index=False)
 
 # %%
+resamp = pivot_fill(to_re, "1D", "price")
+resamp.describe()
+to_re.siteid.value_counts().describe()  # how often does a site change value
+# %%
+resamp_df_brand = gen_df_brand(to_re)
+# %%
+df_brand = pd.pivot_table(
+    to_re,
+    values="site_brand",
+    index="timestamp",
+    columns=["siteid"],
+    aggfunc="first",
+)
+# %%
+df_brand.fillna(method="ffill", inplace=True)
+df_brand.fillna(method="bfill", inplace=True)
+# %%
+df_brand = df_brand.stack().reset_index()
+add_datepart_time(df_brand, "timestamp")
+# %%
+df_brand["timestamp"] = pd.to_datetime(
+    df_brand[["year", "month", "day", "hour"]]
+)
+df_brand = df_brand.drop(columns=["year", "month", "day", "hour"])
+df_brand.columns = ["siteid", "brand", "timestamp"]
+df_brand.drop_duplicates(keep="last", inplace=True)
+# %%
+# %%
+# %%
+# %%
+
+
+# %%
+resamp.describe()
+# %%
+resamp.set_index("timestamp").resample("1D").mean().plot(
+    kind="line", figsize=(16, 6)
+)
+# %%
+resamp[resamp.siteid == "61401007"].set_index("timestamp").plot(
+    kind="line", figsize=(16, 6)
+)
+# %%
+fuels_to_resample = ["e10", "unlead", "pulp_9596_ron", "pulp_98_ron"]
