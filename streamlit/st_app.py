@@ -58,9 +58,8 @@ st.write(
     f"Nr of petrol stations within selected postcodes area selling",
     fuel_type,
     "fuel: ",
+    dfx.siteid.nunique(),
 )
-st.write(dfx.siteid.nunique())
-
 
 dfx_prices = pd.pivot_table(
     dfx.loc[start_date:end_date],
@@ -72,7 +71,6 @@ dfx_prices = pd.pivot_table(
 
 df_plot_sites = dfx_prices.resample(resample_type).mean().bfill()  # fill nans
 
-# st.write("dfx_p", dfx_prices.columns)
 sites = st.sidebar.multiselect(
     "Chose petrol station: ", dfx_prices.columns
 )  # replace with read from file only about sites
@@ -123,14 +121,7 @@ if postcode_mean_plot:
             ),
         )
     )
-# if postcode_mean_plot:
-#     fig2.add_trace(
-#         go.Scatter(
-#             x=df_plot.index,
-#             y=df_plot[fuel_type],
-#             name="QLD mean",
-#             line=dict(color='rgb(210,210,210, 0.2)', width=6,),
-#         ))
+
 for site in sites:
     fig2.add_trace(
         go.Scatter(x=df_plot_sites.index, y=df_plot_sites[site], name=site)
