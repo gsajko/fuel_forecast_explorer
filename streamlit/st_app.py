@@ -92,7 +92,6 @@ df_plot_postcode = (
     dfx_prices.loc[start_date:end_date].resample(resample_type).bfill()
 )
 
-st.write(df_plot_postcode.mean(axis=1))
 QLD_mean_plot = st.sidebar.checkbox("show QLD mean on the plot", value=True)
 postcode_mean_plot = st.sidebar.checkbox("show mean based on postcodes")
 
