@@ -36,14 +36,17 @@ df_pivot = st.session_state.df_pivot
 # sidebar
 start_date = st.sidebar.date_input("From: ", datetime.date(2021, 1, 1))
 end_date = st.sidebar.date_input("From: ", datetime.date(2021, 5, 1))
-fuel_type = st.sidebar.selectbox("fuel type", df_pivot.columns)
+fuel_type = st.sidebar.selectbox(
+    "fuel type", df.fuel_type.value_counts().index.to_list(), 1
+)
+# second most freq sold fuel type as default
 resample_type = st.sidebar.selectbox(
-    "resample period ", ["1H", "6H", "1D", "3D", "W"]
+    "resample period ", ["1H", "6H", "1D", "3D", "W"], 2
 )
 postcodes = st.sidebar.multiselect(
-    "Postcode: ", df.site_post_code.unique(), ["4020"]
+    "Postcode: ", df.site_post_code.unique(), ["4209"]
 )
-#TODO not all postcodes are displayed? no 4000
+# TODO not all postcodes are displayed? no 4000
 
 
 dfx = df[
@@ -87,20 +90,39 @@ df_plot = (
     .bfill()
 )
 
-
-QLD_mean_plot = st.sidebar.checkbox("show QLD mean on the plot", value=True)
-postcode_mean_plot = st.sidebar.checkbox("show postcode mean on the plot")
-
-fig2 = go.Figure(
+df_plot_postcode = (
+    dfx_prices.loc[start_date:end_date].resample(resample_type).bfill()
 )
+
+st.write(df_plot_postcode.mean(axis=1))
+QLD_mean_plot = st.sidebar.checkbox("show QLD mean on the plot", value=True)
+postcode_mean_plot = st.sidebar.checkbox("show mean based on postcodes")
+
+fig2 = go.Figure()
 if QLD_mean_plot:
     fig2.add_trace(
         go.Scatter(
             x=df_plot.index,
             y=df_plot[fuel_type],
             name="QLD mean",
-            line=dict(color='rgb(210,210,210, 0.2)', width=6,),
-        ))
+            line=dict(
+                color="rgba(160,210,210, 0.3)",
+                width=6,
+            ),
+        )
+    )
+if postcode_mean_plot:
+    fig2.add_trace(
+        go.Scatter(
+            x=df_plot_postcode.index,
+            y=df_plot_postcode.mean(axis=1),
+            name="postcode mean",
+            line=dict(
+                color="rgba(160,160,160, 0.2)",
+                width=8,
+            ),
+        )
+    )
 # if postcode_mean_plot:
 #     fig2.add_trace(
 #         go.Scatter(
