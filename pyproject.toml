@@ -5,25 +5,26 @@ description = ""
 authors = ["gsajko <grzegorz.sajko@protonmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.8"
-streamlit = "^0.85.1"
-plotly = "^5.1.0"
-matplotlib = "^3.4.2"
+python = "^3.9"
+pandas = "1.4"
+# streamlit = "^0.85.1"
+# plotly = "^5.1.0"
+# matplotlib = "^3.4.2"
+streamlit = "^1.5.1"
+plotly = "^5.6.0"
+
 
 [tool.poetry.dev-dependencies]
-pytest = "^6.0.2"
-pytest-cov = "^2.10.1"
-pylint = "^2.6.0"
-mypy = "^0.782"
-codecov = "^2.1.9"
-black = "^20.8b1"
+# pylint = "^2.6.0"
+# mypy = "^0.782"
+# codecov = "^2.1.9"
+# great-expectations = "^0.13.19"
+# chardet = "^4.0.0"
+black = "^22.1.0"
 jupyter = "^1.0.0"
-jupyter_contrib_nbextensions = "^0.5.1"
-ipykernel = "^5.3.4"
-jupyter_nbextensions_configurator = "^0.4.1"
-flake8 = "^3.8.4"
-great-expectations = "^0.13.19"
-chardet = "^4.0.0"
+flake8 = "^4.0.1"
+pytest = "^7.0.0"
+pytest-cov = "^3.0.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

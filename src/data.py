@@ -4,8 +4,8 @@ import numpy as np
 from pathlib import Path
 
 # %%
-RAW_DATA_DIR = "data/raw"
-AGG_DATA_DIR = "data/aggregated"
+RAW_DATA_DIR = "../scrape_data/data/month"
+AGG_DATA_DIR = "../data/aggregated"
 
 
 def price_data_aggregation(RAW_DATA_DIR):
@@ -53,7 +53,7 @@ price_data_aggregation(RAW_DATA_DIR).to_csv(
     AGG_DATA_DIR + "/prices_all.csv.gz", index=False, compression="gzip"
 )
 
-
+# %%
 def data_cleaning():
     df = pd.read_csv(AGG_DATA_DIR + "/prices_all.csv.gz", compression="gzip")
     # Missing values - Brand
@@ -75,8 +75,8 @@ def data_cleaning():
     # >The price of 9999 denotes fuel stock that is temporarily unavailable e.g. tank empty and awaiting new stock.
     # change prices from 9999 to -1
     df["price"] = df.price.replace(9999, -1)
-    # remove prices above 2500, and below 600
-    df["price"] = np.where(df.price > 2500, np.NaN, df.price)
+    # remove prices above 3000, and below 600
+    df["price"] = np.where(df.price > 3000, np.NaN, df.price)
     df["price"] = df.price.replace(-1, 9999)  # revert back for no fuel to 9999
     df["price"] = np.where(df.price < 600, np.NaN, df.price)
     df = df.dropna()
@@ -98,3 +98,5 @@ data_cleaning().to_csv(
     index=True,
     compression="gzip",
 )
+
+# %%
