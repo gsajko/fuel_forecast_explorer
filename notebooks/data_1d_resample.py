@@ -1,6 +1,6 @@
 # %%
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 # %%
 # suppress sci notation
@@ -18,6 +18,7 @@ df["siteid"] = df["siteid"].astype(str)
 df["timestamp"] = pd.to_datetime(df["timestamp"])
 df.info(verbose=True, null_counts=True)
 # %%
+
 # fill missing data between fuel price changes
 def pivot_fill(df, sample, to_resample):
     df.timestamp = pd.to_datetime(df.timestamp)
