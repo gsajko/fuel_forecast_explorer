@@ -8,9 +8,9 @@ clean:
 
 style:
 	black .
-	flake8
 	isort .
-	@echo "The style pass! ✨ 🍰 ✨"	
+	flake8 --exclude=scrape_data/* notebooks/*
+	@echo "The style pass! ✨ 🍰 ✨"
 
-check: test lint style
+# check: test lint style
 # check: test lint style mypy

@@ -1,10 +1,11 @@
 # %%
-from os import name
-import streamlit as st
-import pandas as pd
-import numpy as np
-import plotly.graph_objects as go
 import datetime
+
+import numpy as np
+import pandas as pd
+import plotly.graph_objects as go
+
+import streamlit as st
 
 # %%
 if "df_prices_clean" not in st.session_state:
@@ -57,7 +58,7 @@ dfx = df[
 dfx.index = pd.to_datetime(dfx.timestamp)
 dfx.drop(labels="timestamp", axis=1, inplace=True)
 st.write(
-    f"Nr of petrol stations within selected postcodes area selling",
+    "Nr of petrol stations within selected postcodes area selling",
     fuel_type,
     "fuel: ",
     dfx.siteid.nunique(),

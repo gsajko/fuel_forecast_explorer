@@ -1,7 +1,8 @@
 # %%
-import pandas as pd
-import numpy as np
 from pathlib import Path
+
+import numpy as np
+import pandas as pd
 
 # %%
 RAW_DATA_DIR = "../scrape_data/data/month"
@@ -72,7 +73,8 @@ def data_cleaning():
     )
 
     # Cleaning prices
-    # >The price of 9999 denotes fuel stock that is temporarily unavailable e.g. tank empty and awaiting new stock.
+    # >The price of 9999 denotes fuel stock that is temporarily
+    # unavailable e.g. tank empty and awaiting new stock.
     # change prices from 9999 to -1
     df["price"] = df.price.replace(9999, -1)
     # remove prices above 3000, and below 600
@@ -82,6 +84,7 @@ def data_cleaning():
     df = df.dropna()
 
     # closed sites
+    # TODO other solution for closed sites
     closed_sites = pd.read_csv(AGG_DATA_DIR + "/sites_closed.csv", sep=";")
     closed_sites["SiteCode"] = closed_sites["SiteCode"].astype(str)
     closed_sites = closed_sites[
