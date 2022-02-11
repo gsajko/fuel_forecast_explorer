@@ -133,3 +133,6 @@ data/aggregated/prices_all.csv
 # data
 *.csv.gz
 
+notebooks/aggregated/prices_all.csv
+data/aggregated/prices_all_clean.csv.gz
+data/aggregated/prices_all.csv.gz
