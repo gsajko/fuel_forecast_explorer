@@ -3,6 +3,14 @@ This project was created to explore fuel prices data scraped with [my other proj
 
 In future, I'm planning on adding forecasting of future prices.
 
+## Streamlit app
+
+Click [this link](https://gsajko-fuel-forecast-explorer-streamlitst-app-jdeu5y.streamlitapp.com/) for the streamlit app.
+
+
+
+![app screenshot](streamlit_plot.png)
+
 ## setup
 if by running `poetry install` you get error:
 
